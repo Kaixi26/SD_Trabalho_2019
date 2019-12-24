@@ -1,0 +1,57 @@
+package Server.Handlers;
+
+import Server.Communication.*;
+import Server.Manager;
+import Server.SoundCloud.Song;
+
+import java.io.*;
+import java.net.Socket;
+import java.nio.file.FileSystems;
+import java.nio.file.Files;
+import java.nio.file.Path;
+
+public class DownloadHandler extends Thread {
+    private Socket clientSocket;
+    private Manager man;
+    private DownloadRequest req;
+
+    DownloadHandler(Socket clientSocket, Manager man, DownloadRequest req){
+        this.clientSocket = clientSocket;
+        this.man = man;
+        this.req = req;
+    }
+
+    @Override
+    public void run() {
+        try {
+            File file = new File("./data/songs/" + req.getId());
+            System.out.println(man.sc.getSong(0));
+            Song song = man.sc.getSong(req.getId());
+            if (song == null || !file.canRead()) {
+                Replies.send(clientSocket, new DownloadReply(ReplyStates.FAILED));
+                return;
+            }
+            Replies.send(clientSocket, new DownloadReply(ReplyStates.SUCESS, song.getTitle(), song.getAuthor(), song.getYear(), song.getTags()));
+            FileInputStream in = new FileInputStream(file);
+            BufferedOutputStream socketOut = new BufferedOutputStream(clientSocket.getOutputStream());
+            byte[] tmp = new byte[512];
+            int rd;
+            while ((rd = in.read(tmp)) != -1) {
+                socketOut.write(tmp, 0, rd);
+                socketOut.flush();
+            }
+        } catch (Exception e){
+            e.printStackTrace();
+        }
+
+        try {
+            clientSocket.shutdownOutput();
+            clientSocket.shutdownInput();
+            clientSocket.close();
+        }catch (IOException e){
+            e.printStackTrace();
+        }
+
+    }
+
+}
