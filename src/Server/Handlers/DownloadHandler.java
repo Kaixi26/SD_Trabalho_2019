@@ -31,7 +31,7 @@ public class DownloadHandler extends Thread {
                 Replies.send(clientSocket, new DownloadReply(ReplyStates.FAILED));
                 return;
             }
-            Replies.send(clientSocket, new DownloadReply(ReplyStates.SUCESS, song.getTitle(), song.getAuthor(), song.getYear(), song.getTags()));
+            Replies.send(clientSocket, new DownloadReply(ReplyStates.SUCESS, file.length(), song.getTitle(), song.getAuthor(), song.getYear(), song.getTags()));
             FileInputStream in = new FileInputStream(file);
             BufferedOutputStream socketOut = new BufferedOutputStream(clientSocket.getOutputStream());
             byte[] tmp = new byte[512];
@@ -39,6 +39,7 @@ public class DownloadHandler extends Thread {
             while ((rd = in.read(tmp)) != -1) {
                 socketOut.write(tmp, 0, rd);
                 socketOut.flush();
+                sleep(0, 10);
             }
         } catch (Exception e){
             e.printStackTrace();

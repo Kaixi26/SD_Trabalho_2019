@@ -32,8 +32,13 @@ public class ClientHandler extends Thread {
             IRequest req = Requests.parse(in.readLine());
 
             if(!(req instanceof RegisterRequest))
-                try{man.am.authenticate(req.getUsername(), req.getPassword());
-                } catch (FailedAuthenticationException e){System.out.println("Failed authentication.");disconnect();}
+                try{
+                    man.am.authenticate(req.getUsername(), req.getPassword());
+                } catch (FailedAuthenticationException e){
+                    System.out.println("Failed authentication.");
+                    Replies.send(clientSocket, new DefaultReply(ReplyStates.FAILED));
+                    disconnect();
+                }
 
             if (req instanceof UploadRequest)
                 new UploadHandler(clientSocket, man, (UploadRequest) req).start();
@@ -43,6 +48,8 @@ public class ClientHandler extends Thread {
                 new RegisterHandler(clientSocket, man, (RegisterRequest) req).start();
             else if (req instanceof SearchRequest)
                 new SearchHandler(clientSocket, man, (SearchRequest) req).start();
+            else if (req instanceof AuthenticationRequest)
+                Replies.send(clientSocket, new DefaultReply(ReplyStates.SUCESS));
             else
                 disconnect();
         }

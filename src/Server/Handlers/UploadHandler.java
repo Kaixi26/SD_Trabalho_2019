@@ -31,10 +31,16 @@ public class UploadHandler extends Thread {
             BufferedInputStream socketIn = new BufferedInputStream(clientSocket.getInputStream());
             Replies.send(clientSocket, new UploadReply(ReplyStates.SUCESS));
             byte[] buffer = new byte[512];
-            int rd;
-            while((rd = socketIn.read(buffer)) != -1)
+            int rd = 0;
+            long missingRead = req.getSize();
+            while(missingRead > 0){
+                if((rd = socketIn.read(buffer)) == -1) break;
                 fileOut.write(buffer, 0, rd);
+                missingRead-=rd;
+                System.out.println(req.getAuthor() + " " + missingRead + " " + rd);
+            }
             man.sc.add(key, req.getTitle(), req.getAuthor(), req.getYear(), req.getTags());
+            Replies.send(clientSocket, new DefaultReply(ReplyStates.SUCESS));
         } catch (Exception e){
             e.printStackTrace();
         }

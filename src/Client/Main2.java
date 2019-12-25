@@ -13,6 +13,6 @@ public class Main2 {
 
     public static void main(String[] args) throws Exception {
         Socket s = new Socket("localhost", 12345);
-        new DownloadHandler(s, "admin", "admin", 0, "./testdata/lulw").start();
+        //new DownloadHandler(s, "admin", "admin", 0, "./testdata/lulw").start();
     }
 }

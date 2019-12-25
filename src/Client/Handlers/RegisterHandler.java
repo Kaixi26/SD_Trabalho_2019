@@ -1,9 +1,7 @@
 package Client.Handlers;
 
-import Server.Communication.RegisterRequest;
-import Server.Communication.Replies;
-import Server.Communication.Requests;
-import Server.Communication.UploadRequest;
+import Client.Interface.MainPaneReservation;
+import Server.Communication.*;
 
 import java.io.BufferedOutputStream;
 import java.io.File;
@@ -14,16 +12,22 @@ import java.util.Set;
 public class RegisterHandler extends Thread {
     private Socket socket;
     private RegisterRequest req;
+    private MainPaneReservation res;
 
-    public RegisterHandler(Socket socket, String username, String password){
+    public RegisterHandler(Socket socket, MainPaneReservation res, String username, String password){
         this.socket = socket;
         req = new RegisterRequest(username, password);
+        this.res = res;
     }
 
     public void run() {
         try {
             Requests.send(socket, req);
-            Replies.read(socket);
+            IReply rep = Replies.read(socket);
+            if(res == null) return;
+            else if(rep.getState().equals(ReplyStates.FAILED))
+                res.setText("Failed creating user '" + req.getUsername() + "'.");
+            else res.setText("Successfully created new user '" + req.getUsername() + "'.");
         }catch (Exception e){
             e.printStackTrace();
         }

@@ -1,0 +1,26 @@
+$> help
+    help
+    register
+    authenticate
+    download
+    upload
+    search
+## QUEUED (0)
+    [D] 1
+    [U] Skott - Mermaid
+
+## PROGRESSING (0)
+    [D] Skott - Mermaid
+    [U] Skott - Midas
+
+## NOTIFICATIONS (0)
+
+
+
+---------------------------------------------------------------
+$> help help
+
+    usage:
+        help <command>
+    example:
+        help register

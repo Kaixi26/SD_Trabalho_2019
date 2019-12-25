@@ -28,7 +28,7 @@ public class RegisterHandler extends Thread {
         try {
             try {
                 man.am.newAccount(req.getUsername(), req.getPassword());
-                Replies.send(clientSocket, new UploadReply(ReplyStates.SUCESS));
+                Replies.send(clientSocket, new DefaultReply(ReplyStates.SUCESS));
             } catch (InvalidUsernameException e){
                 Replies.send(clientSocket, new DefaultReply(ReplyStates.FAILED));
             }
