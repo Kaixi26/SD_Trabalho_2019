@@ -24,6 +24,8 @@ public class Requests {
                     return DownloadRequest.parse(fields);
                 case RegisterRequest.token:
                     return RegisterRequest.parse(fields);
+                case SearchRequest.token:
+                    return SearchRequest.parse(fields);
             }
         }
         catch (Exception e){

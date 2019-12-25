@@ -29,6 +29,8 @@ public class Replies {
                     return DownloadReply.parse(fields);
                 case DefaultReply.token:
                     return new DefaultReply(fields[1]);
+                case SearchReply.token:
+                    return SearchReply.parse(fields);
             }
         }
         catch (Exception e){

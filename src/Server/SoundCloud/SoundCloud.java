@@ -32,7 +32,7 @@ public class SoundCloud {
         }
     }
 
-    public HashMap<Integer, Song> search(String tag){
+    public Map<Integer, Song> search(String tag){
         l.lock();
         try {
             HashMap<Integer, Song> tmp = new HashMap<>();

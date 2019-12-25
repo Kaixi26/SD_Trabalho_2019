@@ -17,5 +17,6 @@ public class Communication {
         assert ((UploadRequest) reqParsed).getUsername().equals(username) : "Wrong username on request.";
         assert ((UploadRequest) reqParsed).getPassword().equals(password) : "Wrong password on request.";
         assert ((UploadReply) repParsed).getState().equals(ReplyStates.SUCESS) : "Wrong state on reply.";
+
     }
 }

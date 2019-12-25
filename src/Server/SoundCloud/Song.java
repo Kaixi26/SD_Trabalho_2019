@@ -9,7 +9,7 @@ public class Song {
     private int year;
     private Set<String> tags;
 
-    Song(String title, String author, int year, Set<String> tags){
+    public Song(String title, String author, int year, Set<String> tags){
         this.title = title;
         this.author = author;
         this.year = year;

@@ -41,6 +41,8 @@ public class ClientHandler extends Thread {
                 new DownloadHandler(clientSocket, man, (DownloadRequest) req).start();
             else if (req instanceof RegisterRequest)
                 new RegisterHandler(clientSocket, man, (RegisterRequest) req).start();
+            else if (req instanceof SearchRequest)
+                new SearchHandler(clientSocket, man, (SearchRequest) req).start();
             else
                 disconnect();
         }
