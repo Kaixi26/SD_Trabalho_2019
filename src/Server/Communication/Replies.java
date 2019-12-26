@@ -1,5 +1,7 @@
 package Server.Communication;
 
+import Server.Handlers.NotificationHandler;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -31,6 +33,8 @@ public class Replies {
                     return new DefaultReply(fields[1]);
                 case SearchReply.token:
                     return SearchReply.parse(fields);
+                case NotificationReply.token:
+                    return NotificationReply.parse(fields);
             }
         }
         catch (Exception e){

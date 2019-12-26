@@ -28,6 +28,8 @@ public class Requests {
                     return SearchRequest.parse(fields);
                 case AuthenticationRequest.token:
                     return AuthenticationRequest.parse(fields);
+                case NotificationRequest.token:
+                    return NotificationRequest.parse(fields);
             }
         }
         catch (Exception e){

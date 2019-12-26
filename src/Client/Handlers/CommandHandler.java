@@ -27,6 +27,7 @@ public class CommandHandler {
     public void execute(TerminalHandler termHandler, MainPaneReservation res, String command){
         try {
             String[] fields = command.split(" ");
+            res.setText("");
             switch (fields[0]){
                 case "help":
                     if(fields.length == 1) res.setText(HelpText.help);
@@ -61,13 +62,16 @@ public class CommandHandler {
                     } else res.setText("Invalid command.");
                     break;
                 case "authenticate":
-                    if(fields.length == 3) {
+                    if(username != null)
+                        res.setText("Already authenticated as " + username + ".");
+                    else if(fields.length == 3) {
                         Socket tmp = newSocket();
                         Requests.send(tmp, new AuthenticationRequest(fields[1], fields[2]));
                         if(Replies.read(tmp).getState().equals(ReplyStates.SUCESS)) {
                             username = fields[1];
                             password = fields[2];
                             res.setText("Successfully authenticated.");
+                            new NotificationHandler(newSocket(), termHandler, username, password).start();
                         } else res.setText("Failed authentication.");
 
                     } else res.setText("Invalid command.");

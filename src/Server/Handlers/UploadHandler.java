@@ -37,7 +37,7 @@ public class UploadHandler extends Thread {
                 if((rd = socketIn.read(buffer)) == -1) break;
                 fileOut.write(buffer, 0, rd);
                 missingRead-=rd;
-                System.out.println(req.getAuthor() + " " + missingRead + " " + rd);
+                sleep(0, 10);
             }
             man.sc.add(key, req.getTitle(), req.getAuthor(), req.getYear(), req.getTags());
             Replies.send(clientSocket, new DefaultReply(ReplyStates.SUCESS));

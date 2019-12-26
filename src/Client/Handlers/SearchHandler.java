@@ -34,12 +34,13 @@ public class SearchHandler extends Thread {
             List<Map.Entry<Integer, Song>> songsList = rep.getSongs().entrySet().stream().sorted((e1, e2) -> e1.getKey().compareTo(e2.getKey())).collect(Collectors.toList());
             StringBuilder tmp = new StringBuilder();
 
-            for(int i=n; i < songsList.size(); i++)
-            for(Map.Entry<Integer, Song> e : rep.getSongs().entrySet())
+            for(int i=n; i < n+songsList.size(); i++) {
+                Map.Entry<Integer, Song> e = songsList.get(i % songsList.size());
                 tmp.append(e.getKey()).append(" ").append(e.getValue().getTitle())
                         .append(" ").append(e.getValue().getAuthor())
                         .append(" ").append(e.getValue().getYear())
                         .append(" ").append(e.getValue().getTags().toString()).append("\n");
+            }
             res.setText(tmp.toString());
 
         } catch (Exception e){

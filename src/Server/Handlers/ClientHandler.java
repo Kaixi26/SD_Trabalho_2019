@@ -50,6 +50,8 @@ public class ClientHandler extends Thread {
                 new SearchHandler(clientSocket, man, (SearchRequest) req).start();
             else if (req instanceof AuthenticationRequest)
                 Replies.send(clientSocket, new DefaultReply(ReplyStates.SUCESS));
+            else if (req instanceof NotificationRequest)
+                new NotificationHandler(clientSocket, man, (NotificationRequest) req).start();
             else
                 disconnect();
         }
