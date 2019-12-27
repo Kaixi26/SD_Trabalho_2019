@@ -3,6 +3,7 @@ package Server.Handlers;
 import Server.Communication.*;
 import Server.Manager;
 import Server.SoundCloud.Song;
+import Server.TransferManager.TransferReservation;
 
 import java.io.*;
 import java.net.Socket;
@@ -23,6 +24,7 @@ public class DownloadHandler extends Thread {
 
     @Override
     public void run() {
+        TransferReservation tRes = null;
         try {
             File file = new File("./data/songs/" + req.getId());
             System.out.println(man.sc.getSong(0));
@@ -30,6 +32,12 @@ public class DownloadHandler extends Thread {
             if (song == null || !file.canRead()) {
                 Replies.send(clientSocket, new DownloadReply(ReplyStates.FAILED));
                 return;
+            }
+            tRes = man.tm.reserveTransfer(req.getUsername());
+            if(tRes.isInQueue()){
+                Replies.send(clientSocket, new DownloadReply(ReplyStates.QUEUED, file.length(), song.getTitle(), song.getAuthor(), song.getYear(), song.getTags()));
+                System.out.println(song.getTitle());
+                tRes.awaitSpot();
             }
             Replies.send(clientSocket, new DownloadReply(ReplyStates.SUCESS, file.length(), song.getTitle(), song.getAuthor(), song.getYear(), song.getTags()));
             FileInputStream in = new FileInputStream(file);
@@ -43,6 +51,8 @@ public class DownloadHandler extends Thread {
             }
         } catch (Exception e){
             e.printStackTrace();
+        } finally {
+            if(tRes != null) tRes.free();
         }
 
         try {

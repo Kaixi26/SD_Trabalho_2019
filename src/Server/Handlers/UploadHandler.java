@@ -1,7 +1,9 @@
 package Server.Handlers;
 
+import Client.Interface.TerminalHandler;
 import Server.Communication.*;
 import Server.Manager;
+import Server.TransferManager.TransferReservation;
 
 import java.io.*;
 import java.net.Socket;
@@ -23,12 +25,18 @@ public class UploadHandler extends Thread {
     //TODO: get a place for path
     public void run() {
         int key = man.sc.reserveKey();
+        TransferReservation tRes = null;
         try {
             Path p = FileSystems.getDefault().getPath(".","data","songs", key + "");
             Files.createDirectories(p.getParent());
             File tmp = p.toFile();
             FileOutputStream fileOut = new FileOutputStream(tmp);
             BufferedInputStream socketIn = new BufferedInputStream(clientSocket.getInputStream());
+            tRes = man.tm.reserveTransfer(req.getUsername());
+            if(tRes.isInQueue()){
+                Replies.send(clientSocket, new UploadReply(ReplyStates.QUEUED));
+                tRes.awaitSpot();
+            }
             Replies.send(clientSocket, new UploadReply(ReplyStates.SUCESS));
             byte[] buffer = new byte[512];
             int rd = 0;
@@ -43,6 +51,8 @@ public class UploadHandler extends Thread {
             Replies.send(clientSocket, new DefaultReply(ReplyStates.SUCESS));
         } catch (Exception e){
             e.printStackTrace();
+        } finally {
+            if(tRes != null) tRes.free();
         }
 
         try {

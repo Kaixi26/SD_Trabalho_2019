@@ -30,7 +30,7 @@ public class NotificationHandler extends Thread {
                     if(tmp.getState().equals(ReplyStates.FAILED)) return;
                     OutputReservation res = termHandler.reservePaneLine("NOTIFICATIONS");
                     res.updateText("[New Song] " + tmp.getSong().getTitle() + " - " + tmp.getSong().getAuthor());
-                    new OutputReservationHolder(res, 3000).start();
+                    new OutputReservationHolder(res, 5000).start();
                 }
             }
         }catch (Exception e){

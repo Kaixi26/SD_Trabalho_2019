@@ -33,7 +33,7 @@ public class DownloadReply implements IReply {
     }
 
     public String stringSerialize() {
-        if(state.equals(ReplyStates.FAILED) || state.equals(ReplyStates.QUEUED))
+        if(state.equals(ReplyStates.FAILED))
             return token + "\\|" + state;
         StringBuilder tmp = new StringBuilder(new String(token + "\\|" + state + "\\|" + size + "\\|" + title + "\\|" + author + "\\|" + year));
         for(String tag : tags) tmp.append("\\|").append(tag);
