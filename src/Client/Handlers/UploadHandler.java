@@ -3,13 +3,12 @@ package Client.Handlers;
 import Client.Interface.OutputReservation;
 import Client.Interface.TerminalHandler;
 import Server.Communication.*;
+import Constants.ProgramConstants;
 
-import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.net.Socket;
-import java.nio.Buffer;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -67,7 +66,7 @@ public class UploadHandler extends Thread {
 
             OutputReservation outRes = termHandler.reservePaneLine("PROGRESSING");
             outRes.updateText("[U] " + req.getTitle() + " - " + req.getAuthor());
-            byte[] tmp = new byte[512];
+            byte[] tmp = new byte[ProgramConstants.MAX_SIZE];
             int rd;
             while((rd = in.read(tmp)) != -1) {
                 socketOut.write(tmp, 0, rd);

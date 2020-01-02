@@ -1,0 +1,79 @@
+# Introdução
+Este trabalho foi proposto na unidade curricular de sistemas distribuídos, sendo o seu objetivo a construção de uma plataforma
+de troca de ficheiros de música que implemente um servidor e um cliente que comuniquem entre si através de sockets TCP, de
+maneira a satisfazer várias funcionalidades.
+
+# Implementação
+## Comunicação
+A comunicação entre cliente e servidor é feita através do método 'request-reply' na qual o cliente envia uma mensagem
+ao servidor que por sua vez envia ao cliente uma resposta.
+Os 'requests' e 'replies' são serializados como conjuntos de strings intercaladas por '\|'
+(escolhido por ser uma combinação de carateres pouco usada), sendo que a primeira string é um token unico a cada
+request/reply e as restantes são os campos necessários para reconstruir o request/reply.
+Para requests é sempre enviado um campo com o username e outro com a password de maneira a poder ser feita uma
+autenticação/registo do cliente.
+Para replies é sempre enviado um estado do pedido que pode indicar se este foi recebido com sucesso, se está em espera ou
+se, por alguma razão, o não pôde ser concedido.
+
+## Serviços
+Para cada serviço (exceto registo e autenticação inicial) o cliente cria uma nova thread e conexão ao servidor, a
+partir daqui dá-se um conjunto de pedidos e respostas até que o serviço falhe ou seja completado.
+
+### Upload
+É enviado um pedido inicial que contêm que contêm os meta-dados da musica e também o tamanho do ficheiro, o servidor
+envia uma resposta a indicar o estado, caso este seja sucesso, o cliente lê continuamente 'MAX_SIZE' bytes para um buffer e
+após isso envia-os para o servidor até ter enviado todo o ficheiro, quando o servidor acaba de ler todos os bytes do
+ficheiro é enviada uma resposta ao cliente de maneira a indicar que a música foi enviada com sucesso.
+
+### Download
+É enviado um pedido inicial que contêm o identificador da música, após isso o servidor envia os meta-dados do ficheiro
+e o estado do pedido, caso este seja sucesso, o cliente lê continuamente 'MAX_SIZE' bytes do socket para um buffer e
+escreve-os num ficheiro até que o input seja fechado do lado do servidor.
+
+### Pesquisa
+É enviado um pedido inicial que contêm a etiqueta a pesquisar, após isso o servidor envia uma resposta com o id e
+meta-dados de cada música encontrada.
+O formato da serialização da resposta é
+'REPLY_SEARCH\|<id>\|<nº tags>\|<nome>\|<autor>\|<ano>\|<tag_1>\|(...)\|<tag_n>\|<id>\|<nº tags>\|(etc...)'
+
+### Gerênciador de música
+O gerênciador de música oferece os métodos de adição, pesquisa e espera por nova música.
+Quando uma música é adicionada, se existirem threads no método de espera, é colocada a nova
+musica numa variável e são acordadas todas as threads que estavam à espera de que o processo
+de notificação iniciasse, à medida que as threads saem vão também diminuindo um contador com
+o número de threads ainda não notificadas, a ultima thread a sair coloca o valor da variavel
+que continha a música como 'null' e notifica as threads que estavam à espera da finalização
+do processo de notificação.
+
+### Gerênciador de contas
+O gerênciador de contas oferece métodos de adição e autênticação de utilizadores.
+As contas são guardadas num 'HashMap' em que as chaves são os 'usernames' e os valores as correspondentes 'passowrds'.
+
+### Gerênciador de transferências / reservas de transferência
+O gerênciador de transferências oferece métodos para auxiliar à atribuição das transferências para os clientes.
+Uma thread pode pedir ao gerênciador uma reserva para um especificado username, esta pode ser retornada com
+dois estados ativa, caso exista um lugar que não esteja a ser utilizado, ou em espera, caso contrário.
+Para reservas em espera pode posteriormente ser usado um método 'awaitSpot' que espera até que exista um lugar disponível.
+Para quando a transferência é terminada a classe de reserva disponibiliza o método 'free', que liberta o lugar para uma nova transferência.
+Para a atribuição de um novo lugar, é percorrida toda a fila de reservas até encontrar alguma reserva com um username acossiado
+que não esteja atualmente com um lugar de transferência reservado, caso contrário é dado o lugar à primeira reserva que esteja na fila.
+
+### Interface de cliente
+(NOTA RODAPÉ https://en.wikipedia.org/wiki/ANSI_escape_code)
+Para a interface foram utilizados 'ANSI escape sequences' como forma de controlar o movimento do cursor, com o
+intuito de apresentar a informação de forma limpa ao utilizador sendo que o cliente pode fazer multiplos serviços
+de forma paralela, devido a isto, a aplicação deve ser executada num terminal com compatibilidade a estes códigos.
+A classe 'TerminalHandler' fornece métodos para ler e apresentar informação ao utilizador de forma sincrona.
+Existe a noção de um 'pane' principal, que, após ser reservado, só pode ser reservado novamente quando liberto,
+e também de 'subpanes' em que pode ser reservada uma linha.
+As reservas oferecem o método 'setText', para atualizar o texto, bem como o método 'free' para indicar que a
+reserva já não será mais usada.
+
+# Conclusão
+Em suma, o grupo julga que os objetivos relativos a este trabalho foram alcançados, visto que todas a funcionalidades
+propostas, tanto basicas como adicionais, foram implementadas, para além disso foi implementada, com os conhecimentos
+adquiridos na unidade curricular, uma interface com capacidade de suportar várias threads a fazer leitura/escrita.
+No entanto existem também alguns aspetos que podiam ser melhorados, em vez de existir a abertura de uma nova conexão ao servidor
+a cada serviço, poderia ser implementado um mecanismo que mantivesse as conexões após deixarem de ser necessárias de
+maneira a serem reutilizadas, poderia ser também implementado um sistema de filas mais justo que oferecesse lugar ao
+utilizador com menos transferências ativas, sendo que o atual sistema não garante total igualdade entre os utilizadores.

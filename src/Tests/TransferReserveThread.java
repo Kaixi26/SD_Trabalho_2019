@@ -7,7 +7,7 @@ import static java.lang.Thread.sleep;
 public class TransferReserveThread {
 
     public static void main(String[] args) throws Exception {
-        TransferManager tm = new TransferManager();
+        TransferManager tm = new TransferManager(3);
         Thread tmp[] = new Thread[5];
         for(int i=0; i<tmp.length; i++)
             tmp[i] = new TransferReservationTests(tm, "Thread " + i);

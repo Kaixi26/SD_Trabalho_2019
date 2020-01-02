@@ -3,11 +3,12 @@ package Server.AccountManager;
 import Server.SoundCloud.Song;
 
 import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
 public class AccountManager {
-    private HashMap<String, Account> accounts = new HashMap<>();
+    private Map<String, Account> accounts = new HashMap<>();
     private final Lock l = new ReentrantLock();
 
     public AccountManager(){

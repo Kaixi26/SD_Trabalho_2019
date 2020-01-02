@@ -1,8 +1,9 @@
 package Server.Handlers;
 
-import Client.Interface.TerminalHandler;
+import Constants.ServerConstants;
 import Server.Communication.*;
 import Server.Manager;
+import Constants.ProgramConstants;
 import Server.TransferManager.TransferReservation;
 
 import java.io.*;
@@ -38,14 +39,17 @@ public class UploadHandler extends Thread {
                 tRes.awaitSpot();
             }
             Replies.send(clientSocket, new UploadReply(ReplyStates.SUCESS));
-            byte[] buffer = new byte[512];
+            byte[] buffer = new byte[ProgramConstants.MAX_SIZE];
             int rd = 0;
             long missingRead = req.getSize();
             while(missingRead > 0){
                 if((rd = socketIn.read(buffer)) == -1) break;
                 fileOut.write(buffer, 0, rd);
                 missingRead-=rd;
-                sleep(0, 10);
+                if(ServerConstants.MAX_TRANSFER_RATE != 0) {
+                    double waitNanos = ((double)ProgramConstants.MAX_SIZE / ServerConstants.MAX_TRANSFER_RATE) * (10E9);
+                    sleep((int) (waitNanos/(10E6)), (int) (waitNanos%(10E6)));
+                }
             }
             man.sc.add(key, req.getTitle(), req.getAuthor(), req.getYear(), req.getTags());
             Replies.send(clientSocket, new DefaultReply(ReplyStates.SUCESS));

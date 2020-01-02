@@ -6,6 +6,7 @@ import Client.Interface.InputReservation;
 import Client.Interface.MainPaneReservation;
 import Client.Interface.OutputReservation;
 import Client.Interface.TerminalHandler;
+import Constants.ClientConstants;
 import Terminal.TerminalCommander;
 
 import java.net.Socket;
@@ -20,16 +21,15 @@ public class Main {
 
     public static void main(String[] args) throws Exception {
         List<Map.Entry<String, Integer>> subpanes = new ArrayList<>();
-        subpanes.add(new AbstractMap.SimpleImmutableEntry<>("QUEUED",3));
-        subpanes.add(new AbstractMap.SimpleImmutableEntry<>("PROGRESSING",3));
-        subpanes.add(new AbstractMap.SimpleImmutableEntry<>("NOTIFICATIONS",3));
+        subpanes.add(new AbstractMap.SimpleImmutableEntry<>("QUEUED", ClientConstants.LINES_QUEUED));
+        subpanes.add(new AbstractMap.SimpleImmutableEntry<>("PROGRESSING", ClientConstants.LINES_PROGRESSING));
+        subpanes.add(new AbstractMap.SimpleImmutableEntry<>("NOTIFICATIONS", ClientConstants.LINES_NOTIFICATIONS));
 
         TerminalHandler termHandler = new TerminalHandler(6, subpanes);
         MainPaneReservation mainPane = termHandler.reserveMainPane();
         InputReservation inRes = termHandler.reserveInput();
 
         CommandHandler commHandler = new CommandHandler();
-        //mainPane.setText("Line\nLine\nLine\nLine\nLine\nLine\nLine");
 
         while (true){
             String command = inRes.readLine();
@@ -37,6 +37,5 @@ public class Main {
             commHandler.execute(termHandler, mainPane, command);
         }
         termHandler.exit(0);
-        //sleep(5000);
     }
 }

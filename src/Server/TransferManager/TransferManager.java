@@ -5,15 +5,16 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
 public class TransferManager {
-    private static final int MAX_DOWN = 3;
+    private final int MAX_DOWN;
     private int nextID = 0;
     private Lock l = new ReentrantLock();
     private List<TransferReservation> reservationQueues = new ArrayList<>();
-    private TransferReservation[] transferSlots = new TransferReservation[MAX_DOWN];
+    private TransferReservation[] transferSlots;
     private Map<String, Integer> transferSlotsUsers = new HashMap<>();
 
-    public TransferManager(){
-
+    public TransferManager(int MAX_DOWN){
+        this.MAX_DOWN = MAX_DOWN;
+        transferSlots = new TransferReservation[MAX_DOWN];
     }
 
     private int freeSlots(){

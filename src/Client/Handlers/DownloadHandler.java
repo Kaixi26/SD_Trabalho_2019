@@ -3,16 +3,15 @@ package Client.Handlers;
 import Client.Interface.OutputReservation;
 import Client.Interface.TerminalHandler;
 import Server.Communication.*;
+import Constants.ProgramConstants;
 
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileOutputStream;
-import java.io.IOException;
 import java.net.Socket;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Set;
 
 public class DownloadHandler extends Thread {
     private Socket socket;
@@ -65,7 +64,7 @@ public class DownloadHandler extends Thread {
             FileOutputStream fileOut = new FileOutputStream(tmp);
             BufferedInputStream socketIn = new BufferedInputStream(socket.getInputStream());
 
-            byte[] buffer = new byte[512];
+            byte[] buffer = new byte[ProgramConstants.MAX_SIZE];
             int rd;
             while ((rd = socketIn.read(buffer)) != -1)
                 fileOut.write(buffer, 0, rd);
